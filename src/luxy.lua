@@ -2,13 +2,6 @@
 local luxy = {}
 
 
---- Returns if the module is configured.
---
--- @return  boolean
-luxy.is_configured = function()
-  return true == ngx.shared.luxy_conf:get('configured')
-end
-
 --- Stores the configuration for the module.
 --
 -- This call replaces any existing configuration.
@@ -37,6 +30,13 @@ luxy.configure = function(config)
   end
 
   luxy_conf:set('configured', true)
+end
+
+--- Returns if the module is configured.
+--
+-- @return  boolean
+luxy.is_configured = function()
+  return true == ngx.shared.luxy_conf:get('configured')
 end
 
 
