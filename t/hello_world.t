@@ -1,13 +1,13 @@
+use File::Spec;
 use Test::Nginx::Socket;
-use Cwd qw(cwd);
 
 # setup testing environment
-my $pwd = cwd();
+my $html_dir    = html_dir();
+my $fixture_dir = File::Spec->catfile($html_dir, '..', '..', 'fixtures');
 
-our $HttpConfig = qq{
-    lua_package_path "$pwd/src/?.lua;;";
-};
-
+open my $fh, '<', File::Spec->catfile($fixture_dir, 'http.conf');
+read $fh, our $http_config, -s $fh;
+close $fh;
 
 # proceed with testing
 repeat_each(2);
@@ -18,7 +18,7 @@ run_tests();
 __DATA__
 
 === TEST 1: Hello World
---- http_config eval: $::HttpConfig
+--- http_config eval: $::http_config
 --- config
     location /t {
         content_by_lua '
