@@ -7,7 +7,8 @@ $ENV{TEST_NGINX_PORT} ||= 1984;
 my $html_dir    = html_dir();
 my $fixture_dir = File::Spec->catfile($html_dir, '..', '..', 'fixtures');
 
-open my $fh, '<', File::Spec->catfile($fixture_dir, 'http.conf');
+open(my $fh, '<', File::Spec->catfile($fixture_dir, 'http.conf'))
+  or die "cannot open < http.conf: $!";
 read $fh, our $http_config, -s $fh;
 close $fh;
 
