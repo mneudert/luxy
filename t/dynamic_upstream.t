@@ -19,50 +19,32 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: Before Configuration
+=== TEST 1: Application Upstream
 --- http_config eval: $::http_config
 --- config
     location /t {
-        content_by_lua '
-            ngx.say(luxy.is_configured())
+        rewrite_by_lua '
+            ngx.req.set_header("Host", "application")
         ';
+
+        proxy_pass  http://application;
     }
 --- request
 GET /t
 --- response_body
-false
+upstream: application/t
 
-=== TEST 2: After Configuration
+=== TEST 1: Legacy Upstream
 --- http_config eval: $::http_config
 --- config
     location /t {
-        content_by_lua '
-            luxy.configure({})
-            ngx.say(luxy.is_configured())
+        rewrite_by_lua '
+            ngx.req.set_header("Host", "legacy")
         ';
+
+        proxy_pass  http://legacy;
     }
 --- request
 GET /t
 --- response_body
-true
-
-=== TEST 3: Resetting Configuration
---- http_config eval: $::http_config
---- config
-    location /t {
-        content_by_lua '
-            luxy.configure({ foo = "bar" })
-            ngx.say(luxy.is_configured())
-
-            ngx.say(ngx.shared.luxy_conf:get("foo"))
-
-            luxy.configure(nil)
-            ngx.say(luxy.is_configured())
-        ';
-    }
---- request
-GET /t
---- response_body
-true
-bar
-false
+upstream: legacy/t
