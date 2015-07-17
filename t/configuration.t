@@ -4,12 +4,12 @@ use Test::Nginx::Socket;
 # setup testing environment
 $ENV{TEST_NGINX_PORT} ||= 1984;
 
-my $html_dir    = html_dir();
-my $fixture_dir = File::Spec->catfile($html_dir, '..', '..', 'fixtures');
+my $html_dir     = html_dir();
+my $fixture_dir  = File::Spec->catfile($html_dir, '..', '..', 'fixtures');
+my $fixture_http = File::Spec->catfile($fixture_dir, 'http.conf');
 
-open(my $fh, '<', File::Spec->catfile($fixture_dir, 'http.conf'))
-  or die "cannot open < http.conf: $!";
-read $fh, our $http_config, -s $fh;
+open(my $fh, '<', $fixture_http) or die "cannot open < $fixture_http: $!";
+read($fh, our $http_config, -s $fh);
 close $fh;
 
 # proceed with testing
