@@ -1,0 +1,34 @@
+language: perl
+perl:     5.20
+sudo:     required
+
+env:
+  global:
+    - VER_LUA_NGINX=0.9.16
+    - VER_NGX_DEVEL=0.2.19
+    - VER_NGINX=1.9.3
+
+before_install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libluajit-5.1-dev libluajit-5.1.2
+  - sudo apt-get install -qq gcc-4.8 g++-4.8
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
+
+install:
+  - mkdir ./vendor && cd ./vendor
+
+  - wget "http://nginx.org/download/nginx-${VER_NGINX}.tar.gz" -O nginx.tar.gz && tar -xf nginx.tar.gz
+  - wget "https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX}.tar.gz" -O lua-nginx-module.tar.gz && tar -xf lua-nginx-module.tar.gz
+  - wget "https://github.com/simpl/ngx_devel_kit/archive/v${VER_NGX_DEVEL}.tar.gz" -O ngx-devel-kit.tar.gz && tar -xf ngx-devel-kit.tar.gz
+
+  - cd "./nginx-${VER_NGINX}"
+  - export LUAJIT_LIB=/usr/lib/x86_64-linux-gnu/
+  - export LUAJIT_INC=/usr/include/luajit-2.0/
+  - ./configure --add-module="../ngx_devel_kit-${VER_NGX_DEVEL}" --add-module="../lua-nginx-module-${VER_LUA_NGINX}"
+  - sudo make install
+  - export PATH=$PATH:/usr/local/nginx/sbin
+
+  - cpanm -v --notest Test::Nginx
+
+script: cd ${TRAVIS_BUILD_DIR} && prove
