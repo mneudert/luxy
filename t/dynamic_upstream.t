@@ -21,32 +21,76 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: Application Upstream
+=== TEST 1: Default Upstream
 --- http_config eval: $::http_config
 --- config
     location /t {
-        rewrite_by_lua '
-            ngx.req.set_header("Host", "application")
+        content_by_lua '
+            luxy.configure({ default_upstream = "application" })
+            ngx.say(luxy.get_upstream())
         ';
-
-        proxy_pass  http://application;
     }
 --- request
 GET /t
 --- response_body
-upstream: application/t
+application
 
-=== TEST 1: Legacy Upstream
+=== TEST 2: Upstream by Request URI
 --- http_config eval: $::http_config
 --- config
     location /t {
+        content_by_lua '
+            luxy.configure({ default_upstream = "application" })
+            luxy.set_mappings({ ["/t"] = "legacy" })
+
+            ngx.say(luxy.get_upstream())
+        ';
+    }
+--- request
+GET /t
+--- response_body
+legacy
+
+=== Test 3: Execute Upstream (legacy as default)
+--- http_config eval: $::http_config
+--- config
+    location /t {
+        set  $upstream  '';
+
         rewrite_by_lua '
-            ngx.req.set_header("Host", "legacy")
+            luxy.configure({ default_upstream = "legacy" })
+            luxy.set_mappings({ ["/unmatched"] = "application" })
+
+            ngx.var.upstream = luxy.get_upstream();
+
+            ngx.req.set_header("Host", ngx.var.upstream);
         ';
 
-        proxy_pass  http://legacy;
+        proxy_pass  http://$upstream;
     }
 --- request
 GET /t
 --- response_body
 upstream: legacy/t
+
+=== Test 3: Execute Upstream (application as match)
+--- http_config eval: $::http_config
+--- config
+    location /t {
+        set  $upstream  '';
+
+        rewrite_by_lua '
+            luxy.configure({ default_upstream = "legacy" })
+            luxy.set_mappings({ ["/t"] = "application" })
+
+            ngx.var.upstream = luxy.get_upstream();
+
+            ngx.req.set_header("Host", ngx.var.upstream);
+        ';
+
+        proxy_pass  http://$upstream;
+    }
+--- request
+GET /t
+--- response_body
+upstream: application/t
