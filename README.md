@@ -1,6 +1,6 @@
 # Luxy
 
-Dynamic upstream selection (URI based) for nginx.
+Dynamic upstream selection (URI based) for NGINX.
 
 
 ## Usage
