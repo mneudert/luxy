@@ -1,5 +1,6 @@
 language: perl
 perl:     5.20
+sudo:     false
 
 addons:
   apt:
@@ -13,24 +14,11 @@ addons:
 
 env:
   global:
+    - LUAJIT_LIB=/usr/lib/x86_64-linux-gnu/
+    - LUAJIT_INC=/usr/include/luajit-2.0/
     - VER_LUA_NGINX=0.9.16
     - VER_NGX_DEVEL=0.2.19
-    - VER_NGINX=1.9.3
+    - VER_NGINX=1.9.5
 
-install:
-  - mkdir ./vendor && cd ./vendor
-
-  - wget "http://nginx.org/download/nginx-${VER_NGINX}.tar.gz" -O nginx.tar.gz && tar -xf nginx.tar.gz
-  - wget "https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX}.tar.gz" -O lua-nginx-module.tar.gz && tar -xf lua-nginx-module.tar.gz
-  - wget "https://github.com/simpl/ngx_devel_kit/archive/v${VER_NGX_DEVEL}.tar.gz" -O ngx-devel-kit.tar.gz && tar -xf ngx-devel-kit.tar.gz
-
-  - cd "./nginx-${VER_NGINX}"
-  - export LUAJIT_LIB=/usr/lib/x86_64-linux-gnu/
-  - export LUAJIT_INC=/usr/include/luajit-2.0/
-  - ./configure --add-module="${TRAVIS_BUILD_DIR}/vendor/ngx_devel_kit-${VER_NGX_DEVEL}" --add-module="${TRAVIS_BUILD_DIR}/vendor/lua-nginx-module-${VER_LUA_NGINX}"
-  - make
-  - export PATH="$PATH:${TRAVIS_BUILD_DIR}/vendor/nginx-${VER_NGINX}/objs"
-
-  - cpanm -v --notest Test::Nginx
-
-script: cd ${TRAVIS_BUILD_DIR} && prove
+install: cpanm -v --notest Test::Nginx
+script:  ./compile_and_test.sh
