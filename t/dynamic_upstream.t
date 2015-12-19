@@ -25,10 +25,10 @@ __DATA__
 --- http_config eval: $::http_config
 --- config
     location /t {
-        content_by_lua '
-            luxy.configure({ default_upstream = "application" })
+        content_by_lua_block {
+            luxy.configure({ default_upstream = 'application' })
             ngx.say(luxy.get_upstream())
-        ';
+        }
     }
 --- request
 GET /t
@@ -39,12 +39,12 @@ application
 --- http_config eval: $::http_config
 --- config
     location /t {
-        content_by_lua '
-            luxy.configure({ default_upstream = "application" })
-            luxy.set_mappings({ ["/t"] = "legacy" })
+        content_by_lua_block {
+            luxy.configure({ default_upstream = 'application' })
+            luxy.set_mappings({ ['/t'] = 'legacy' })
 
             ngx.say(luxy.get_upstream())
-        ';
+        }
     }
 --- request
 GET /t
@@ -57,14 +57,14 @@ legacy
     location /t {
         set  $upstream  '';
 
-        rewrite_by_lua '
-            luxy.configure({ default_upstream = "legacy" })
-            luxy.set_mappings({ ["/unmatched"] = "application" })
+        rewrite_by_lua_block {
+            luxy.configure({ default_upstream = 'legacy' })
+            luxy.set_mappings({ ['/unmatched'] = 'application' })
 
             ngx.var.upstream = luxy.get_upstream();
 
-            ngx.req.set_header("Host", ngx.var.upstream);
-        ';
+            ngx.req.set_header('Host', ngx.var.upstream);
+        }
 
         proxy_pass  http://$upstream;
     }
@@ -79,14 +79,14 @@ upstream: legacy/t
     location /t {
         set  $upstream  '';
 
-        rewrite_by_lua '
-            luxy.configure({ default_upstream = "legacy" })
-            luxy.set_mappings({ ["/t"] = "application" })
+        rewrite_by_lua_block {
+            luxy.configure({ default_upstream = 'legacy' })
+            luxy.set_mappings({ ['/t'] = 'application' })
 
             ngx.var.upstream = luxy.get_upstream();
 
-            ngx.req.set_header("Host", ngx.var.upstream);
-        ';
+            ngx.req.set_header('Host', ngx.var.upstream);
+        }
 
         proxy_pass  http://$upstream;
     }

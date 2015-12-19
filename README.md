@@ -12,11 +12,11 @@ lua_package_path  '/path/to/luxy/src/?.lua;;';
 lua_shared_dict   luxy_conf   1m;
 lua_shared_dict   luxy_proxy  8m;
 
-init_by_lua '
+init_by_lua_block {
     luxy = require("luxy")
     luxy.configure({ default_upstream = "legacy" })
     luxy.set_mappings(nil)
-';
+}
 ```
 
 Currently the best way to map paths to upstream is to configure them in the

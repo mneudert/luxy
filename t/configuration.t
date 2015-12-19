@@ -25,9 +25,9 @@ __DATA__
 --- http_config eval: $::http_config
 --- config
     location /t {
-        content_by_lua '
+        content_by_lua_block {
             ngx.say(luxy.is_configured())
-        ';
+        }
     }
 --- request
 GET /t
@@ -38,10 +38,10 @@ false
 --- http_config eval: $::http_config
 --- config
     location /t {
-        content_by_lua '
+        content_by_lua_block {
             luxy.configure({})
             ngx.say(luxy.is_configured())
-        ';
+        }
     }
 --- request
 GET /t
@@ -52,15 +52,15 @@ true
 --- http_config eval: $::http_config
 --- config
     location /t {
-        content_by_lua '
-            luxy.configure({ foo = "bar" })
+        content_by_lua_block {
+            luxy.configure({ foo = 'bar' })
             ngx.say(luxy.is_configured())
 
-            ngx.say(ngx.shared.luxy_conf:get("foo"))
+            ngx.say(ngx.shared.luxy_conf:get('foo'))
 
             luxy.configure(nil)
             ngx.say(luxy.is_configured())
-        ';
+        }
     }
 --- request
 GET /t
