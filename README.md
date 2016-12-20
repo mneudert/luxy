@@ -79,7 +79,7 @@ VER_LUA_NGINX=0.9.16 \
     ./compile_and_test.sh
 ```
 
-The four passed variables `VER_LUA_NGINX`, `VER_NGX_DEVEL` and
+The three passed variables `VER_LUA_NGINX`, `VER_NGX_DEVEL` and
 `VER_NGINX` define the module versions your are using for compilation. If a
 variable is not passed to the script it will be automatically taken from your
 environment. An error messages will be printed if no value is available.
