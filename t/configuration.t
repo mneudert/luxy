@@ -1,12 +1,11 @@
-use Cwd qw(cwd);
+use File::Basename;
 use File::Spec;
 use Test::Nginx::Socket;
 
 # setup testing environment
 $ENV{TEST_NGINX_PORT} ||= 1984;
 
-my $pwd          = cwd();
-my $fixture_dir  = File::Spec->catfile($pwd, 't', 'fixtures');
+my $fixture_dir  = File::Spec->catfile(dirname(__FILE__), 'fixtures');
 my $fixture_http = File::Spec->catfile($fixture_dir, 'http.conf');
 
 open(my $fh, '<', $fixture_http) or die "cannot open < $fixture_http: $!";
