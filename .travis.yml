@@ -1,5 +1,5 @@
 language: perl
-sudo:     false
+sudo: false
 
 addons:
   apt:
@@ -16,4 +16,4 @@ env:
     - VER_NGINX=1.12.2
 
 install: cpanm -v --notest Test::Nginx
-script:  ./compile_and_test.sh
+script: ./compile_and_test.sh
