@@ -12,7 +12,6 @@ env:
     - LUAJIT_LIB=/usr/lib/x86_64-linux-gnu/
     - LUAJIT_INC=/usr/include/luajit-2.0/
     - VER_LUA_NGINX=0.10.10
-    - VER_NGX_DEVEL=0.3.0
     - VER_NGINX=1.12.2
 
 install: cpanm -v --notest Test::Nginx
