@@ -7,12 +7,29 @@ addons:
       - libluajit-5.1-2
       - libluajit-5.1-dev
 
-env:
-  global:
-    - LUAJIT_LIB=/usr/lib/x86_64-linux-gnu/
-    - LUAJIT_INC=/usr/include/luajit-2.0/
-    - VER_LUA_NGINX=0.10.10
-    - VER_NGINX=1.12.2
-
 install: cpanm -v --notest Test::Nginx
-script: ./compile_and_test.sh
+script: |-
+  export LUAJIT_LIB=/usr/lib/x86_64-linux-gnu/
+  export LUAJIT_INC=/usr/include/luajit-2.0/
+  export VER_LUA_NGINX=0.10.10
+  export VER_NGINX=1.12.2
+
+  mkdir -p "${TRAVIS_BUILD_DIR}/vendor"
+
+  pushd "${TRAVIS_BUILD_DIR}/vendor"
+    wget -q "http://nginx.org/download/nginx-${VER_NGINX}.tar.gz" -O nginx.tar.gz \
+      && tar -xf nginx.tar.gz
+
+    wget -q "https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX}.tar.gz" -O lua-nginx-module.tar.gz \
+      && tar -xf lua-nginx-module.tar.gz
+  popd
+
+  pushd "${TRAVIS_BUILD_DIR}/vendor/nginx-${VER_NGINX}"
+    ./configure --add-module="${TRAVIS_BUILD_DIR}/vendor/lua-nginx-module-${VER_LUA_NGINX}"
+
+    make || exit $?
+  popd
+
+  export PATH="$PATH:${TRAVIS_BUILD_DIR}/vendor/nginx-${VER_NGINX}/objs"
+
+  prove
